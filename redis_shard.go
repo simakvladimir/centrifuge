@@ -210,6 +210,9 @@ func NewRedisShard(_ *Node, conf RedisShardConfig) (*RedisShard, error) {
 	if conf.IOTimeout == 0 {
 		conf.IOTimeout = defaultRedisIOTimeout
 	}
+	if conf.MaxFlushDelay == 0 {
+		conf.MaxFlushDelay = 100 * time.Millisecond
+	}
 	options := rueidis.ClientOption{
 		SelectDB:         conf.DB,
 		ConnWriteTimeout: conf.IOTimeout,
@@ -221,7 +224,7 @@ func NewRedisShard(_ *Node, conf RedisShardConfig) (*RedisShard, error) {
 		DisableCache:     true,
 		AlwaysPipelining: true,
 		AlwaysRESP2:      conf.ForceRESP2,
-		MaxFlushDelay:    100 * time.Microsecond,
+		MaxFlushDelay:    conf.MaxFlushDelay,
 		Dialer: net.Dialer{
 			Timeout: conf.ConnectTimeout,
 		},
@@ -362,6 +365,11 @@ type RedisShardConfig struct {
 	// be initialized with the same options as the main client but with ReplicaOnly option
 	// set to true.
 	ReplicaClientEnabled bool
+
+	// MaxFlushDelay when greater than zero pauses pipeline write loop for some time (not larger than MaxFlushDelay)
+	// after each flushing of data to the connection. Negative value disable flushing.
+	// By default, 100 us is used.
+	MaxFlushDelay time.Duration
 }
 
 type RedisShardMode string
