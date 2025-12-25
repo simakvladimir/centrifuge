@@ -211,7 +211,7 @@ func NewRedisShard(_ *Node, conf RedisShardConfig) (*RedisShard, error) {
 		conf.IOTimeout = defaultRedisIOTimeout
 	}
 	if conf.MaxFlushDelay == 0 {
-		conf.MaxFlushDelay = 100 * time.Millisecond
+		conf.MaxFlushDelay = 100 * time.Microsecond
 	}
 	options := rueidis.ClientOption{
 		SelectDB:         conf.DB,
